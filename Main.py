@@ -6,21 +6,15 @@ from Ball import Ball
 
 B = 10
 
-boundaries = [-B, B, -B, B]
+boundaries = [-B, B, -B, B, -B, B]
 Menv = Environment(boundaries)
 
-ball_count = 25
+ball_count = 5
 
 for i in range(ball_count):
-    Menv.add_ball(
-        Ball(
-            Menv,                           # environment
-            'blue',                         # color
-            np.random.uniform(1, 10),       # mass
-            np.random.uniform(1, B, 3),     # center
-            np.random.uniform(1, 5),        # radius
-            np.random.uniform(1, B, 3)      # velocity
-            )
-        )
+    Menv.add_ball()
+
+for b in Menv.balls:
+    print(str(b))
 
 Menv.run()

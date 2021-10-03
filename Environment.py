@@ -10,8 +10,25 @@ class Environment():
         self.boundaries = boundaries
         self.balls = []
 
-    def add_ball(self, b) -> None:
-        self.balls.append(b)
+    def add_ball(self) -> None:
+        valid_ball_FLAG = False
+        while not valid_ball_FLAG:
+            # Construct a ball.
+            b = Ball(
+                self,                           # environment
+                'blue',                         # color
+                np.random.uniform(1, 10),       # mass
+                np.random.uniform(1, self.boundaries[1], 3),     # center
+                np.random.uniform(1, 5),        # radius
+                np.random.uniform(1, self.boundaries[1], 3)      # velocity
+                )
+
+            # Add the constructed ball to this environment if it does not overlap with any ball in this environment.
+            if not self.overlap_with(b) and not self.outside_boundaries(b):
+                self.balls.append(b)
+                valid_ball_FLAG = True
+
+        return
 
     def run(self, t_end=10) -> None:
         print('start run - time = 0.0 sec')
@@ -48,5 +65,20 @@ class Environment():
                         tmp_collision_time = np.min(collision_times)
                         if not next_collision_event or (tmp_collision_time < next_collision_event[0]):
                             next_collision_event = (tmp_collision_time, b1, b2)
+        # check collisions with boundaries  
         self.next_event = next_collision_event
+
+    def overlap_with(self, b):
+        overlap_FLAG = False
+        for b2 in self.balls:
+            if b.overlap_with(b2):
+                overlap_FLAG = True
+                continue
+        return overlap_FLAG
+
+    def outside_boundaries(self, b):
+        return False if (self.boundaries[0] < (b.c[0] - b.r)) and ((b.c[0] + b.r) < self.boundaries[1]) \
+        and (self.boundaries[2] < (b.c[1] - b.r)) and ((b.c[1] + b.r) < self.boundaries[3]) \
+        and (self.boundaries[4] < (b.c[2] - b.r)) and ((b.c[2] + b.r) < self.boundaries[5]) else True
+
                 

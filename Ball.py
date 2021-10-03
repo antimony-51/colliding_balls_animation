@@ -48,3 +48,20 @@ class Ball():
 
         # print(np.roots([a, b, c]))
         return np.roots([a, b, c])
+
+    def get_collision_time_with_boundaries(self, boundaries):
+        collision_times = np.zeros(6)
+        collision_times[0] = (boundaries[0] - self.c[0])/self.v[0]
+        collision_times[1] = (boundaries[1] - self.c[0])/self.v[0]
+        collision_times[2] = (boundaries[2] - self.c[1])/self.v[1]
+        collision_times[3] = (boundaries[3] - self.c[1])/self.v[1]
+        collision_times[5] = (boundaries[5] - self.c[2])/self.v[2]
+        collision_times[6] = (boundaries[6] - self.c[2])/self.v[2]
+        return np.where(collision_times > 0, collision_times, np.inf).min()
+
+    def overlap_with(self, b2) -> bool:
+        d = np.linalg.norm(self.c - b2.c)
+        return d <= (self.r + b2.r)
+
+    def __str__(self):
+        return f'Ball with mass {self.m:.1f} and radius {self.r:.1f} at position {self.c} with velocity vector {self.v}'
