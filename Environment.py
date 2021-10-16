@@ -9,6 +9,8 @@ class Environment():
         self.time = 0.0
         self.boundaries = boundaries
         self.balls = []
+        self.keyframes = []
+        self.next_event = None
 
     def add_ball(self) -> None:
         valid_ball_FLAG = False
@@ -31,12 +33,26 @@ class Environment():
         return
 
     def run(self, t_end=10) -> None:
+        # Initialize the run.
         print('start run - time = 0.0 sec')
-        while (self.time < t_end):
-            self.next_event()
-        print(f'end run - time = {t_end:.1f} sec')
+        for b in self.balls:
+            self.keyframes.append(b.get_keyframe())
 
-    def next_event(self) -> None:
+        # Run.
+        while (self.time < t_end):
+            self.proceed_to_next_event()
+
+        # Terminate the run.
+        print(f'end run - time = {t_end:.1f} sec')
+        for b in self.balls:
+            self.keyframes.append(b.get_keyframe())
+
+        # Output.
+        print('run terminated')
+        print(f'{len(self.keyframes):d} keyframes registered.')
+
+    def proceed_to_next_event(self) -> None:
+        self.next_collision()
         Dt, b1, b2 = self.next_event
         self.time += Dt
 
@@ -46,12 +62,16 @@ class Environment():
 
         print(Dt)
 
-        # Ball 1 and ball 2 collide.
+        # Ball 1 and ball 2 collide if b2 is a Ball.
+        # Ball 1 collides with a boundary if b2 is an integer.
         b1.collide(b2)
+        self.keyframes.append(b1.get_keyframe())
+        if (isinstance(b2, Ball)):
+            self.keyframes.append(b2.get_keyframe())
 
     def next_collision(self) -> tuple:
         last_event = self.next_event
-        last_colliding_balls = [last_event[1], last_event[2]]
+        last_colliding_balls = [last_event[1], last_event[2]] if last_event else []
         next_collision_event = None
         for b1 in self.balls:
             for b2 in self.balls:
@@ -65,7 +85,13 @@ class Environment():
                         tmp_collision_time = np.min(collision_times)
                         if not next_collision_event or (tmp_collision_time < next_collision_event[0]):
                             next_collision_event = (tmp_collision_time, b1, b2)
-        # check collisions with boundaries  
+        # check collisions with boundaries 
+        # check collisions with cuboid boundaries.
+        for b1 in self.balls:
+            tmp_collision_event = b1.get_collision_time_with_boundaries(self.boundaries)
+            if not next_collision_event or (tmp_collision_event[0] < next_collision_event[0]):
+                next_collision_event = tmp_collision_event
+
         self.next_event = next_collision_event
 
     def overlap_with(self, b):
