@@ -43,16 +43,16 @@ class Ball():
 
     def get_collision_time_with(self, b2) -> np.array:
         # b2 can be an instance of Ball or an array of 4 elements that represents walls.
-        # solve r1 + r2 = (c1 + t*v1)**2 + (c2 + t*v2)**2 for t
+        # solve (r1 + r2)**2 = (c1 + t*v1)**2 + (c2 + t*v2)**2 for t
         # select the smallest t.
         # None if no collision
         Dc = self.c - b2.c
         Dv = self.v - b2.v
-        Dr = self.r - b2.r
+        Sr = self.r + b2.r
 
         a = np.square(np.linalg.norm(Dv))
         b = 2*np.dot(Dc, Dv)
-        c = np.square(np.linalg.norm(Dc)) - np.square(Dr)
+        c = np.square(np.linalg.norm(Dc)) - np.square(Sr)
 
         # print(np.roots([a, b, c]))
         return np.roots([a, b, c])
@@ -77,3 +77,14 @@ class Ball():
 
     def __str__(self):
         return f'Ball {self.id:d} with mass {self.m:.1f} and radius {self.r:.1f} at position {self.c} with velocity vector {self.v}'
+
+if __name__=='__main__':
+    # 2 equal balls in opposite directions.
+    b1 = Ball('None', 'blue', 1, np.array([-5,0,0]), 1, np.array([+1,0,0]))
+    b2 = Ball('None', 'blue', 1, np.array([+5,0,0]), 1, np.array([-1,0,0]))
+    print(b1.get_collision_time_with(b2))
+
+    # 1 ball from the left, and one from the top, cover equal distances at equal velocities.
+    b3 = Ball('None', 'blue', 1, np.array([-5,0,0]), 1, np.array([+1,0,0]))
+    b4 = Ball('None', 'blue', 1, np.array([0,+5,0]), 1, np.array([0,-1,0]))
+    print(b3.get_collision_time_with(b4))

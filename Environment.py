@@ -64,7 +64,7 @@ class Environment():
         for b in self.balls:
             b.move(Dt)
 
-        print(Dt)
+        print(f'we are now {self.time:.2f} sec and proceed {Dt:.2f} sec')
 
         # Ball 1 and ball 2 collide if b2 is a Ball.
         # Ball 1 collides with a boundary if b2 is an integer.
