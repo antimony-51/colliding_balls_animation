@@ -73,7 +73,7 @@ class Ball():
         return d <= (self.r + b2.r)
 
     def get_keyframe(self):
-        return ('Ball', self.id, self.c[0], self.c[1], self.c[2], 0, 0, 0, self.r, self.r, self.r)
+        return ('Ball', self.id, True, self.c[0], self.c[1], self.c[2], 0, 0, 0, self.r, self.r, self.r)
 
     def __str__(self):
         return f'Ball {self.id:d} with mass {self.m:.1f} and radius {self.r:.1f} at position {self.c} with velocity vector {self.v}'

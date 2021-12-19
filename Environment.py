@@ -1,3 +1,6 @@
+import csv
+import pandas as pd
+
 import numpy as np
 from numpy.lib.type_check import isreal
 
@@ -22,7 +25,7 @@ class Environment():
                 np.random.uniform(1, 10),       # mass
                 np.random.uniform(1, self.boundaries[1], 3),     # center
                 np.random.uniform(1, 5),        # radius
-                np.random.uniform(1, self.boundaries[1], 3)      # velocity
+                np.random.uniform(1, self.boundaries[1], 3)/25.0      # velocity
                 )
 
             # Add the constructed ball to this environment if it does not overlap with any ball in this environment.
@@ -32,11 +35,11 @@ class Environment():
 
         return
 
-    def run(self, t_end=10) -> None:
+    def run(self, t_end=100) -> None:
         # Initialize the run.
         print('start run - time = 0.0 sec')
         for b in self.balls:
-            self.keyframes.append(b.get_keyframe())
+            self.keyframes.append((self.time, *b.get_keyframe()))
 
         # Run.
         while (self.time < t_end):
@@ -45,11 +48,12 @@ class Environment():
         # Terminate the run.
         print(f'end run - time = {t_end:.1f} sec')
         for b in self.balls:
-            self.keyframes.append(b.get_keyframe())
+            self.keyframes.append((self.time, *b.get_keyframe()))
 
         # Output.
         print('run terminated')
         print(f'{len(self.keyframes):d} keyframes registered.')
+        print(self.keyframes)
 
     def proceed_to_next_event(self) -> None:
         self.next_collision()
@@ -65,9 +69,9 @@ class Environment():
         # Ball 1 and ball 2 collide if b2 is a Ball.
         # Ball 1 collides with a boundary if b2 is an integer.
         b1.collide(b2)
-        self.keyframes.append(b1.get_keyframe())
+        self.keyframes.append((self.time, *b1.get_keyframe()))
         if (isinstance(b2, Ball)):
-            self.keyframes.append(b2.get_keyframe())
+            self.keyframes.append((self.time, *b2.get_keyframe()))
 
     def next_collision(self) -> tuple:
         last_event = self.next_event
@@ -106,5 +110,15 @@ class Environment():
         return False if (self.boundaries[0] < (b.c[0] - b.r)) and ((b.c[0] + b.r) < self.boundaries[1]) \
         and (self.boundaries[2] < (b.c[1] - b.r)) and ((b.c[1] + b.r) < self.boundaries[3]) \
         and (self.boundaries[4] < (b.c[2] - b.r)) and ((b.c[2] + b.r) < self.boundaries[5]) else True
+
+    def write_csv(self, filename):
+        '''
+        with open(filename, 'w') as f:
+            csv_writer = csv.writer(f)
+            csv_writer.writerow(('time', 'entity', 'id', 'visibility', 'x', 'y', 'z', 'alpha', 'beta', 'gamma', 'scalex', 'scaley', 'scalez'))
+            for row in self.keyframes:
+                csv_writer.writerow(row)
+                '''
+        pd.DataFrame(self.keyframes, columns=('Time', 'entity', 'id', 'visibility', 'x', 'y', 'z', 'alpha', 'beta', 'gamma', 'scalex', 'scaley', 'scalez')).to_csv(filename, index=False)
 
                 

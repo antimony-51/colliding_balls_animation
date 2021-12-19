@@ -17,4 +17,5 @@ for i in range(ball_count):
 for b in Menv.balls:
     print(str(b))
 
-Menv.run()
+Menv.run(t_end=500)
+Menv.write_csv('keyframes.csv')
