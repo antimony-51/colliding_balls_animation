@@ -6,10 +6,10 @@ from Ball import Ball
 
 B = 10
 
-boundaries = [-B, B, -B, B, -B, B]
+boundaries = [-B, B, -B, B, -B, B] # -x, +x, -y, +y, -z, +z
 Menv = Environment(boundaries)
 
-ball_count = 5
+ball_count = 1
 
 for i in range(ball_count):
     Menv.add_ball()

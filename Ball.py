@@ -58,14 +58,15 @@ class Ball():
         return np.roots([a, b, c])
 
     def get_collision_time_with_boundaries(self, boundaries):
+        # exclude boundary of last event?
         collision_times = np.zeros(6)
-        collision_times[0] = (boundaries[0] - self.c[0])/self.v[0]
-        collision_times[1] = (boundaries[1] - self.c[0])/self.v[0]
-        collision_times[2] = (boundaries[2] - self.c[1])/self.v[1]
-        collision_times[3] = (boundaries[3] - self.c[1])/self.v[1]
-        collision_times[4] = (boundaries[4] - self.c[2])/self.v[2]
-        collision_times[5] = (boundaries[5] - self.c[2])/self.v[2]
-        collision_times = np.where(collision_times > 0, collision_times, np.inf) 
+        collision_times[0] = (boundaries[0] + self.r - self.c[0])/self.v[0]
+        collision_times[1] = (boundaries[1] - self.r - self.c[0])/self.v[0]
+        collision_times[2] = (boundaries[2] + self.r - self.c[1])/self.v[1]
+        collision_times[3] = (boundaries[3] - self.r - self.c[1])/self.v[1]
+        collision_times[4] = (boundaries[4] + self.r - self.c[2])/self.v[2]
+        collision_times[5] = (boundaries[5] - self.r - self.c[2])/self.v[2]
+        collision_times = np.where(collision_times > 1e-12, collision_times, np.inf) # 2 events; sufficiently spaced in time.
         return (collision_times.min(), self, collision_times.argmin())
 
     def overlap_with(self, b2) -> bool:
