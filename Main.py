@@ -9,7 +9,7 @@ B = 10
 boundaries = [-B, B, -B, B, -B, B] # -x, +x, -y, +y, -z, +z
 Menv = Environment(boundaries)
 
-ball_count = 1
+ball_count = 5
 
 for i in range(ball_count):
     Menv.add_ball()
@@ -17,5 +17,5 @@ for i in range(ball_count):
 for b in Menv.balls:
     print(str(b))
 
-Menv.run(t_end=500)
+Menv.run(t_end=1000.0)
 Menv.write_csv('keyframes.csv')

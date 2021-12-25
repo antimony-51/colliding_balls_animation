@@ -13,6 +13,12 @@ class Ball():
         Ball.ID += 1
         self.id = Ball.ID
 
+    def get_impulse(self):
+        return self.m * self.v
+
+    def get_kinetic_energy(self):
+        return 0.5 * self.m * np.dot(self.v, self.v)
+
     def move(self, dt):
         self.c += dt*self.v
 
@@ -25,18 +31,28 @@ class Ball():
             self.n = self.n/np.linalg.norm(self.n)
             b2.n = -self.n
 
-            self.vn = np.dot(self.v, self.n)
-            b2.vn = np.dot(b2.v, b2.n)
+            self.vn = np.dot(self.v, self.n)*self.n
+            b2.vn = np.dot(b2.v, b2.n)*b2.n
 
             self.vt = self.v - self.vn
             b2.vt = b2.v - b2.vn
 
             total_mass = self.m + b2.m
-            self.vn = 2*b2.m/total_mass*b2.vn + (self.m - b2.m)/total_mass*self.vn
-            b2.vn = 2*self.m/total_mass*self.vn + (b2.m - self.m)/total_mass*b2.vn
+
+            v_n_self_i = np.linalg.norm(self.vn)
+            v_n_b2_i = np.linalg.norm(b2.vn)
+            # initial_vn = self.vn
+            # self.vn = 2*b2.m/total_mass*b2.vn + (self.m - b2.m)/total_mass*self.vn
+            # b2.vn = 2*self.m/total_mass*initial_vn + (b2.m - self.m)/total_mass*b2.vn
+            v_n_self_f = 2*b2.m/total_mass*v_n_b2_i + (self.m - b2.m)/total_mass*v_n_self_i
+            v_n_b2_f = 2*self.m/total_mass*v_n_self_i + (b2.m - self.m)/total_mass*v_n_b2_i
+
+            self.vn = self.vn/np.linalg.norm(self.vn)*v_n_self_f
+            b2.vn = b2.vn/np.linalg.norm(b2.vn)*v_n_b2_f
 
             self.v = self.vn + self.vt
             b2.v = b2.vn + b2.vt
+            print('done')
         else:
             axis = b2//2
             self.v[axis] = -self.v[axis]

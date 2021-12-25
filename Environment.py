@@ -44,7 +44,7 @@ class Environment():
         # Run.
         while (self.time < t_end):
             self.proceed_to_next_event()
-            if self.time > 130.0:
+            if self.time > 278.0:
                 print('debug')
 
         # Terminate the run.
@@ -66,14 +66,25 @@ class Environment():
         for b in self.balls:
             b.move(Dt)
 
-        print(f'we are now {self.time:.2f} sec and proceed {Dt:.2f} sec')
+        print(f'we are now {self.time:.2f} sec and proceeded {Dt:.2f} sec')
 
         # Ball 1 and ball 2 collide if b2 is a Ball.
         # Ball 1 collides with a boundary if b2 is an integer.
+        if (isinstance(b2, Ball)):
+            print('collision of balls')
         b1.collide(b2)
         self.keyframes.append((self.time, *b1.get_keyframe()))
         if (isinstance(b2, Ball)):
             self.keyframes.append((self.time, *b2.get_keyframe()))
+
+        # impulse checksum
+        total_impulse = 0
+        total_kinetic_energy = 0
+        for b in self.balls:
+            total_impulse += b.get_impulse()
+            total_kinetic_energy += b.get_kinetic_energy()
+        print(f'total impulse is {total_impulse:.3f}')
+        print(f'total kinetic energy is {total_kinetic_energy:.3f}')
 
     def next_collision(self) -> tuple:
         last_event = self.next_event
@@ -84,6 +95,7 @@ class Environment():
                 # if 3 balls collide simultaneously, the we end up in an infinite loop!
                 continue
             collision_times = b1.get_collision_time_with(b2)
+            # print(f'Ball {b1.id:d} and Ball {b2.id:d} collide at {str(collision_times):s}')
             if (0 < len(collision_times)) and (np.isreal(collision_times[0])):
                 collision_times = collision_times[0 <= collision_times]
                 if (0 < len(collision_times)):
