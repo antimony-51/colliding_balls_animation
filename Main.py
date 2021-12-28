@@ -5,13 +5,7 @@ from Environment import Environment
 
 B = 25
 
-boundaries = [-B, B, -B, B, -B, B] # -x, +x, -y, +y, -z, +z
-Menv = Environment(boundaries)
-
-ball_count = 40
-
-for i in range(ball_count):
-    Menv.add_ball()
-
+Menv = Environment([-B, B, -B, B, -B, B]) # -x, +x, -y, +y, -z, +z
+Menv.add_n_balls(40)
 Menv.run(t_end=60.0)
 Menv.write_csv('keyframes.csv')

@@ -37,6 +37,11 @@ class Environment():
 
         return
 
+    def add_n_balls(self, n=10):
+        # add n balls to the environment
+        for i in range(n):
+            self.add_ball()
+
     def run(self, t_end=100.0) -> None:
         # Initialize the run.
         print('')
