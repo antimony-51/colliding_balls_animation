@@ -19,13 +19,15 @@ class Environment():
         valid_ball_FLAG = False
         while not valid_ball_FLAG:
             # Construct a ball.
+            v_tmp = np.random.uniform(0, 1, 3)
+            v_tmp = v_tmp/np.linalg.norm(v_tmp)*np.random.uniform(1,3,1)
             b = Ball(
                 self,                           # environment
                 'blue',                         # color
-                1, # np.random.uniform(1, 10),       # mass
+                1, # np.random.uniform(1, 10),       # mass in kg
                 np.random.uniform(self.boundaries[0], self.boundaries[1], 3),     # center
                 1, # np.random.uniform(1, 5),        # radius
-                np.random.uniform(1, self.boundaries[1], 3)/25.0      # velocity
+                v_tmp      # velocity
                 )
 
             # Add the constructed ball to this environment if it does not overlap with any ball in this environment.
@@ -35,27 +37,37 @@ class Environment():
 
         return
 
-    def run(self, t_end=100) -> None:
+    def run(self, t_end=100.0) -> None:
         # Initialize the run.
-        print('start run - time = 0.0 sec')
+        print('')
+        print('COLLIDING BALLS SIMULATION')
+        print('--------------------------\n')
+        
+        print('The following balls are in the environment:')
+        total_impulse = np.zeros(3)
+        total_ke = 0
         for b in self.balls:
             self.keyframes.append((self.time, *b.get_keyframe()))
+            total_impulse += b.get_impulse()
+            total_ke += b.get_kinetic_energy()
+            print(str(b))
+
+        print(f'\ntotal impulse vector is {str(total_impulse):s} N.s with absolute value {np.linalg.norm(total_impulse):.1f} N.s')
+        print(f'total kinetic energy is {total_ke:.1f} J')
+
+        print('\nstart simulation: time = 0.0 sec\n')
 
         # Run.
         while (self.time < t_end):
             self.proceed_to_next_event()
-            if self.time > 278.0:
-                print('debug')
 
         # Terminate the run.
-        print(f'end run - time = {t_end:.1f} sec')
+        print(f'\nend simulation: time = {t_end:.1f} sec')
         for b in self.balls:
             self.keyframes.append((self.time, *b.get_keyframe()))
 
         # Output.
-        print('run terminated')
-        print(f'{len(self.keyframes):d} keyframes registered.')
-        print(self.keyframes)
+        print(f'\n{len(self.keyframes):d} keyframes registered in keyframes.csv.\n')
 
     def proceed_to_next_event(self) -> None:
         self.next_collision()
@@ -66,7 +78,7 @@ class Environment():
         for b in self.balls:
             b.move(Dt)
 
-        print(f'we are now {self.time:.2f} sec and proceeded {Dt:.2f} sec')
+        # print(f'we are now {self.time:.2f} sec and proceeded {Dt:.2f} sec')
 
         # Ball 1 and ball 2 collide if b2 is a Ball.
         # Ball 1 collides with a boundary if b2 is an integer.
@@ -76,15 +88,6 @@ class Environment():
         self.keyframes.append((self.time, *b1.get_keyframe()))
         if (isinstance(b2, Ball)):
             self.keyframes.append((self.time, *b2.get_keyframe()))
-
-        # impulse checksum
-        total_impulse = 0
-        total_kinetic_energy = 0
-        for b in self.balls:
-            total_impulse += b.get_impulse()
-            total_kinetic_energy += b.get_kinetic_energy()
-        print(f'total impulse is {total_impulse:.3f}')
-        print(f'total kinetic energy is {total_kinetic_energy:.3f}')
 
     def next_collision(self) -> tuple:
         last_event = self.next_event
