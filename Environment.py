@@ -20,7 +20,7 @@ class Environment():
         while not valid_ball_FLAG:
             # Construct a ball.
             v_tmp = np.random.uniform(0, 1, 3)
-            v_tmp = v_tmp/np.linalg.norm(v_tmp)*np.random.uniform(1,3,1)
+            v_tmp = v_tmp/np.linalg.norm(v_tmp)*np.random.uniform(1,3,1)*3
             b = Ball(
                 self,                           # environment
                 'blue',                         # color
